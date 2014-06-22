@@ -1,0 +1,26 @@
+#!/usr/bin/python3
+
+import argparse
+import json
+
+from cryptonet.rpcserver import RPCClient
+
+parser = argparse.ArgumentParser()
+parser.add_argument('hostport', metavar='HOST:PORT', type=str, help='host:port to connect to')
+parser.add_argument('-auth', metavar='USER:PASS', type=str, nargs=1, default=[':'], help='authentication if required')
+parser.add_argument('method', metavar='METHOD', type=str, help='method to call')
+parser.add_argument('payload', nargs='*', default=[], help='arguments')
+args = parser.parse_args()
+
+payload = args.payload
+auth = args.auth[0].split(':')
+hostport = args.hostport
+method = args.method
+
+client = RPCClient('http://%s/' % hostport, username=auth[0], password=auth[1])
+
+response = client.request(method, payload)
+if "error" not in response:
+  print(json.dumps(response['result'], indent=4))
+else:
+  print(json.dumps(response, indent=4))
